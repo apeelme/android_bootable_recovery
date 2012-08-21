@@ -96,8 +96,8 @@ static int get_framebuffer(GGLSurface *fb)
     fb->stride = vi.xres;
 #endif
     fb->data = bits;
-    fb->format = GGL_PIXEL_FORMAT_RGB_565;
-    memset(fb->data, 0, vi.yres * vi.xres * 2);
+    fb->format = GGL_PIXEL_FORMAT_RGBA_8888;
+    memset(fb->data, 0, vi.yres * vi.xres * 4);		//weng: need *4?
 
     fb++;
 
@@ -109,10 +109,10 @@ static int get_framebuffer(GGLSurface *fb)
     fb->data = (void*) (((unsigned) bits) + vi.yres * fi.line_length);
 #else
     fb->stride = vi.xres;
-    fb->data = (void*) (((unsigned) bits) + vi.yres * vi.xres * 2);
+    fb->data = (void*) (((unsigned) bits) + vi.yres * vi.xres * 4);
 #endif
-    fb->format = GGL_PIXEL_FORMAT_RGB_565;
-    memset(fb->data, 0, vi.yres * vi.xres * 2);
+    fb->format = GGL_PIXEL_FORMAT_RGBA_8888;
+    memset(fb->data, 0, vi.yres * vi.xres * 4);
 
     return fd;
 }
@@ -122,8 +122,8 @@ static void get_memory_surface(GGLSurface* ms) {
   ms->width = vi.xres;
   ms->height = vi.yres;
   ms->stride = vi.xres;
-  ms->data = malloc(vi.xres * vi.yres * 2);
-  ms->format = GGL_PIXEL_FORMAT_RGB_565;
+  ms->data = malloc(vi.xres * vi.yres * 4);
+  ms->format = GGL_PIXEL_FORMAT_RGBA_8888;
 }
 
 static void set_active_framebuffer(unsigned n)
@@ -131,7 +131,7 @@ static void set_active_framebuffer(unsigned n)
     if (n > 1) return;
     vi.yres_virtual = vi.yres * 2;
     vi.yoffset = n * vi.yres;
-    vi.bits_per_pixel = 16;
+    vi.bits_per_pixel = 32;
     if (ioctl(gr_fb_fd, FBIOPUT_VSCREENINFO, &vi) < 0) {
         perror("active fb swap failed");
     }
@@ -157,7 +157,7 @@ void gr_flip(void)
     /* copy data from the in-memory surface to the buffer we're about
      * to make active. */
     memcpy(gr_framebuffer[gr_active_fb].data, gr_mem_surface.data,
-           vi.xres * vi.yres * 2);
+           vi.xres * vi.yres * 4);
 
     /* inform the display driver */
     set_active_framebuffer(gr_active_fb);

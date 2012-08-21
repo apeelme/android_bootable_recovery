@@ -970,7 +970,8 @@ main(int argc, char **argv) {
     // Otherwise, get ready to boot the main system...
     finish_recovery(send_intent);
     if(!poweroff)
-        ui_print("Rebooting...\n");
+//        ui_print("Rebooting...\n");
+	system("/sbin/sh /sbin/killrecovery.sh");
     else
         ui_print("Shutting down...\n");
     sync();
